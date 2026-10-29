@@ -68,6 +68,17 @@ function setup({ env = { CUECAPS_API_KEY: KEY }, me = summary(), after = summary
   return { call, calls, files };
 }
 
+test("every tool says what it does to the world", () => {
+  for (const t of TOOLS) {
+    const a = t.annotations;
+    assert.ok(a?.title, t.name);
+    for (const hint of ["readOnlyHint", "destructiveHint", "idempotentHint", "openWorldHint"]) assert.equal(typeof a[hint], "boolean", `${t.name} ${hint}`);
+    assert.equal(a.destructiveHint, false, t.name); // no tool replaces or deletes anything
+  }
+  const readOnly = TOOLS.filter((t) => t.annotations.readOnlyHint).map((t) => t.name);
+  assert.deepEqual(readOnly, ["list_styles", "studio_link", "account_status"]);
+});
+
 test("studio_link and list_styles need no key", async () => {
   const tools = handlers({ env: {}, fetchMe: never, withStudio: never, open: never, unlink: never, exists: () => false });
   assert.deepEqual(TOOLS.map((t) => t.name), ["list_styles", "studio_link", "account_status", "transcribe", "caption_video"]);

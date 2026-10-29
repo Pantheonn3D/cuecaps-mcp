@@ -29,14 +29,38 @@ const JOB = {
 const EXTS = OUTPUTS.map((o) => `.${o}`).join(", ").replace(/, ([^,]+)$/, " or $1"); // ".mp4, .mov, .webm, .srt or .vtt"
 const schema = (properties, required = []) => ({ type: "object", properties, ...(required.length && { required }), additionalProperties: false });
 
+// Annotations tell clients what a call does to the world: read-only, idempotent, and whether it reaches cuecaps.com.
+const annotations = (title, { readOnly, idempotent, network }) => ({ title, readOnlyHint: readOnly, destructiveHint: false, idempotentHint: idempotent, openWorldHint: network });
+
 export const TOOLS = [
-  { name: "list_styles", description: "The 10 Cuecaps caption styles: the id to pass as style, the name, and how each one looks.", inputSchema: schema({}) },
-  { name: "studio_link", description: "A Cuecaps studio link that opens set up with these settings. The user drops in their video and exports in the browser. Works on every plan, with no key.", inputSchema: schema(LINK) },
-  { name: "account_status", description: "The Cuecaps plan behind the key: cloud minutes left this period, the date they reset, and whether it includes agent captioning.", inputSchema: schema({}) },
-  { name: "transcribe", description: "Every word of a local video or audio file with its start and end time in seconds, plus the SRT text and the engine used. Writes no file. Creator and Pro.", inputSchema: schema(JOB, ["path"]) },
+  {
+    name: "list_styles",
+    description: "Lists the 10 Cuecaps caption styles, each with the id to pass as style to caption_video or studio_link, its name and how it looks. The list is fixed and needs no key. Call it when the user hasn't picked a style or asks what the styles look like.",
+    inputSchema: schema({}),
+    annotations: annotations("List caption styles", { readOnly: true, idempotent: true, network: false }),
+  },
+  {
+    name: "studio_link",
+    description: "Returns a URL to the Cuecaps studio, opened with these caption settings, for the user to finish in their browser: they drop in the video, can fix words and export there. Creates nothing and needs no key, so it works on every plan, Free included. Use it when the user wants to edit by hand, has no Creator or Pro key, or the file isn't on this machine; use caption_video to make the file directly.",
+    inputSchema: schema(LINK),
+    annotations: annotations("Make a studio link", { readOnly: true, idempotent: true, network: false }),
+  },
+  {
+    name: "account_status",
+    description: "Reads the Cuecaps account behind CUECAPS_API_KEY: the plan, cloud minutes left this period, the date they reset, and whether agent captioning is included. Uses no minutes. Call it before transcribe or caption_video to check the plan and minutes; with no key or an invalid key it returns an error that says how to get one.",
+    inputSchema: schema({}),
+    annotations: annotations("Check the Cuecaps account", { readOnly: true, idempotent: true, network: true }),
+  },
+  {
+    name: "transcribe",
+    description: "Transcribes a local video or audio file and returns every word with its start and end time in seconds, plus the SRT text and the engine used. Writes no file: use caption_video when the user wants a captioned video, an overlay or a subtitle file. Needs a Creator or Pro key. engine \"cloud\" uses the plan's minutes and sends only compressed audio, deleted after transcription; \"device\" runs Whisper locally and uses none. Left unset, it picks cloud when the minutes left cover the file, else device.",
+    inputSchema: schema(JOB, ["path"]),
+    annotations: annotations("Transcribe a file", { readOnly: false, idempotent: false, network: true }),
+  },
   {
     name: "caption_video",
-    description: "Captions a local video or audio file with the Cuecaps studio's own renderer in headless Chrome or Edge, and writes <name>.captions.<ext> next to it: an MP4 with the captions burned in, a transparent MOV or WebM overlay, or SRT or VTT subtitles. The video stays on this machine. Returns the file, its duration in seconds, the engine used, the cloud minutes used and a studio link to fine-tune words and style. Creator and Pro.",
+    description: "Captions a local video or audio file with the Cuecaps studio's renderer in headless Chrome or Edge and writes <name>.captions.<ext> next to it, never replacing a file: an MP4 with the captions burned in, a transparent MOV or WebM overlay, or SRT or VTT subtitles. Returns the file, its duration in seconds, the engine, the cloud minutes used and a studio link to fine-tune words and style. Needs a Creator or Pro key; 1440p and 4K need Pro. Transcription works as in transcribe, and the video never leaves this machine. Use transcribe when only the words are needed, and studio_link when the user wants to edit by hand or has no key.",
+    annotations: annotations("Caption a video", { readOnly: false, idempotent: false, network: true }),
     inputSchema: schema({
       ...JOB, ...LINK,
       // No schema default: with out_path, output follows its extension, and a client that fills in defaults would clash.
