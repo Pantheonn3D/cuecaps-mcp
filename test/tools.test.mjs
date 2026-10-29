@@ -2,6 +2,7 @@
 // studio. No browser and no SDK. Run from the repo root: node --test mcp/test/tools.test.mjs
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { readdirSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { TOOLS, handlers } from "../src/tools.js";
 import { fetchMe } from "../src/account.js";
@@ -67,6 +68,11 @@ function setup({ env = { CUECAPS_API_KEY: KEY }, me = summary(), after = summary
   const call = (name, args, signal) => tools[name](args, { progress: (m) => calls.progress.push(m), signal });
   return { call, calls, files };
 }
+
+test("the source has LF line endings, or the bin's #! line breaks on macOS and Linux", () => {
+  const dir = new URL("../src/", import.meta.url);
+  for (const f of readdirSync(dir)) assert.ok(!readFileSync(new URL(f, dir)).includes(13), `${f} has CR characters`);
+});
 
 test("every tool says what it does to the world", () => {
   for (const t of TOOLS) {
