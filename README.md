@@ -6,6 +6,20 @@ Cuecaps studio's own export in headless Chrome or Edge on your machine, so the r
 settings. Once the project syncs to your account, `caption_video` also returns a studio link that opens it, to fix a word
 or change the style.
 
+## No install: the hosted server
+
+Apps that connect to an MCP server by URL can use **`https://cuecaps.com/mcp`** (Streamable HTTP) with no install and no
+key: claude.ai and the Claude apps on phone and desktop, ChatGPT, Gemini CLI, Claude Code and Cursor. It has
+`list_styles` and `studio_link`, so you ask for captions the way you'd describe them ("karaoke captions on a Spanish
+TikTok") and get a studio link set up for them, to finish in your browser. To caption a file on your computer directly,
+use this package (below).
+
+- claude.ai: Settings, Connectors, Add custom connector, and paste `https://cuecaps.com/mcp`.
+- Claude Code: `claude mcp add --transport http cuecaps https://cuecaps.com/mcp`
+- Gemini CLI, in `~/.gemini/settings.json`: `{ "mcpServers": { "cuecaps": { "httpUrl": "https://cuecaps.com/mcp" } } }`
+
+Setup for every client: [cuecaps.com/ai-assistants](https://cuecaps.com/ai-assistants).
+
 ## Requirements
 
 - Node 22 or later.
