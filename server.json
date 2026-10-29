@@ -1,0 +1,37 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.Pantheonn3D/cuecaps-mcp",
+  "title": "Cuecaps",
+  "description": "Animated word-by-word captions for your video and audio files, rendered on your machine by Cuecaps.",
+  "repository": {
+    "url": "https://github.com/Pantheonn3D/cuecaps-mcp",
+    "source": "github"
+  },
+  "websiteUrl": "https://cuecaps.com/ai-assistants",
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "cuecaps-mcp",
+      "version": "0.1.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "CUECAPS_API_KEY",
+          "description": "Your key from cuecaps.com/account (Creator or Pro). list_styles and studio_link work without one.",
+          "isRequired": false,
+          "isSecret": true,
+          "format": "string"
+        },
+        {
+          "name": "CUECAPS_CHROME",
+          "description": "Path to Chrome or Edge, when it isn't at a standard install path.",
+          "isRequired": false,
+          "format": "string"
+        }
+      ]
+    }
+  ]
+}

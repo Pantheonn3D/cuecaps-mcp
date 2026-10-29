@@ -1,0 +1,47 @@
+{
+  "name": "cuecaps-mcp",
+  "version": "0.1.0",
+  "mcpName": "io.github.Pantheonn3D/cuecaps-mcp",
+  "description": "Caption a video or audio file on your computer with Cuecaps, from any MCP client.",
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "captions",
+    "subtitles",
+    "video",
+    "transcription",
+    "whisper",
+    "srt",
+    "vtt",
+    "tiktok",
+    "youtube-shorts"
+  ],
+  "homepage": "https://cuecaps.com/ai-assistants",
+  "author": "Pantheon3D",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Pantheonn3D/cuecaps-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Pantheonn3D/cuecaps-mcp/issues"
+  },
+  "type": "module",
+  "bin": {
+    "cuecaps-mcp": "src/server.js"
+  },
+  "files": [
+    "src"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test test/browser.test.mjs test/tools.test.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "zod": "4.6.7"
+  }
+}
