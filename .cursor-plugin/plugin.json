@@ -3,14 +3,13 @@
   "displayName": "Cuecaps",
   "version": "0.2.0",
   "description": "Animated word-by-word captions for TikTok, YouTube Shorts and Reels, plus Fast edit cuts for dead space, filler words and retakes. Hosted MCP server, no key needed.",
-  "author": { "name": "Pantheon3D", "url": "https://cuecaps.com" },
+  "author": {
+    "name": "Cuecaps",
+    "email": "support@cuecaps.com"
+  },
   "homepage": "https://cuecaps.com/ai-assistants",
   "repository": "https://github.com/Pantheonn3D/cuecaps-mcp",
   "license": "MIT",
-  "logo": "assets/logo.svg",
-  "keywords": ["captions", "subtitles", "video", "transcription", "tiktok", "youtube-shorts", "reels"],
-  "mcpServers": {
-    "cuecaps": { "url": "https://cuecaps.com/mcp" }
-  },
-  "skills": "skills"
+  "keywords": ["captions", "subtitles", "video", "transcription", "tiktok", "youtube-shorts", "reels", "mcp", "skills"],
+  "logo": "assets/logo.svg"
 }
