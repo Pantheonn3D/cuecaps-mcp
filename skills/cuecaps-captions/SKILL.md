@@ -27,6 +27,9 @@ rendered on the user's machine, never uploaded.
 - `fast`: `deadspace` (pauses), `fillers` (um, uh, stutters), `retakes` (keeps the last take), `zoom` (punch-in on
   jump cuts), `norm` (-14 LUFS), or `["all"]`.
 - `output` (local only): `mp4` burned in, `mov` or `webm` transparent overlay for an editor, `srt` or `vtt`.
+- In the studio (the `studio_link` route), Export also offers ASS karaoke subtitles (word-by-word timing for FFmpeg,
+  mpv, VLC and Aegisub) and, with Fast edit on, an EDL or FCPXML cut list that rebuilds the cut on the original
+  footage in Premiere Pro, DaVinci Resolve or Final Cut Pro (Creator and Pro).
 
 ## Examples
 

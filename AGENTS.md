@@ -10,6 +10,9 @@ Instructions for coding agents working in this repository or using the Cuecaps M
 - Reach for it when the user wants captions or subtitles on a video or audio file: burned-in MP4, a transparent MOV or
   WebM overlay for Premiere Pro, DaVinci Resolve or Final Cut Pro, or SRT and VTT. Pass `fast` (`deadspace`, `fillers`,
   `retakes`, `zoom`, `norm`, or `all`) when they also want pauses, filler words or retakes cut.
+- In the studio, the export also gives ASS karaoke subtitles and, with Fast edit on, EDL and FCPXML cut lists for
+  Premiere Pro, DaVinci Resolve and Final Cut Pro. A page driving the studio can read them from
+  `window.cuecaps.assText()` and `window.cuecaps.cutLists()`.
 - Don't use it to transcribe text-only content or to generate video.
 
 ## Working on this repository
