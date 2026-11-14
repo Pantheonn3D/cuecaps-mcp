@@ -19,7 +19,27 @@ use this package (below).
 
 - claude.ai: Settings, Connectors, Add custom connector, and paste `https://cuecaps.com/mcp`.
 - Claude Code: `claude mcp add --transport http cuecaps https://cuecaps.com/mcp`
-- Gemini CLI, in `~/.gemini/settings.json`: `{ "mcpServers": { "cuecaps": { "httpUrl": "https://cuecaps.com/mcp" } } }`
+- Cursor: [Add to Cursor](https://cursor.com/en/install-mcp?name=cuecaps&config=eyJ1cmwiOiJodHRwczovL2N1ZWNhcHMuY29tL21jcCJ9)
+- VS Code: [Install in VS Code](https://insiders.vscode.dev/redirect/mcp/install?name=cuecaps&config=%7B%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Fcuecaps.com%2Fmcp%22%7D)
+- Gemini CLI: `gemini extensions install https://github.com/Pantheonn3D/cuecaps-mcp`, or in `~/.gemini/settings.json`:
+  `{ "mcpServers": { "cuecaps": { "httpUrl": "https://cuecaps.com/mcp" } } }`
+- Codex CLI, in `~/.codex/config.toml`: `[mcp_servers.cuecaps]` then `url = "https://cuecaps.com/mcp"`
+- goose: open `goose://extension?url=https%3A%2F%2Fcuecaps.com%2Fmcp&type=streamable_http&id=cuecaps&name=Cuecaps&description=Animated%20word-by-word%20captions`
+  in your browser, or add a Remote Extension (Streamable HTTP) with the URL above.
+- Continue, in `.continue/mcpServers/cuecaps.yaml`:
+
+  ```yaml
+  name: Cuecaps
+  version: 0.0.1
+  schema: v1
+  mcpServers:
+    - name: Cuecaps
+      type: streamable-http
+      url: https://cuecaps.com/mcp
+  ```
+
+- Cline: Settings, MCP Servers, Remote Servers, with the URL above. Agents setting it up can follow
+  [llms-install.md](llms-install.md).
 
 Setup for every client: [cuecaps.com/ai-assistants](https://cuecaps.com/ai-assistants).
 
