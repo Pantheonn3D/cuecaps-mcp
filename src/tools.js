@@ -2,7 +2,7 @@
 // their deps injected ({ env, fetchMe, withStudio, open, unlink, exists }), so tests run with no browser; server.js passes
 // the real ones.
 import { basename, dirname, extname, isAbsolute } from "node:path";
-import { STYLES, LANGS, ASPECTS, POSITIONS, OUTPUTS, RESOLUTIONS, FPS } from "./vocab.js";
+import { STYLES, LANGS, ASPECTS, POSITIONS, FAST, OUTPUTS, RESOLUTIONS, FPS } from "./vocab.js";
 import { studioLink, studioQuery } from "./link.js";
 import { freePath, outputPath } from "./paths.js";
 import { message } from "./errors.js";
@@ -19,6 +19,7 @@ const LINK = {
   position: { type: "string", enum: POSITIONS, description: "Where the captions sit in the frame." },
   aspect: { type: "string", enum: ASPECTS, description: "Frame shape: 9:16 for TikTok, Shorts and Reels, 1:1 or 4:5 for feed posts, 16:9 for YouTube." },
   lang: { type: "string", enum: LANGS, description: "The spoken language. Give it for any video that isn't in English; auto lets cloud transcription detect it." },
+  fast: { type: "array", items: { type: "string", enum: ["all", ...FAST] }, maxItems: FAST.length + 1, description: "Fast edit tools to turn on once the words are found: deadspace cuts the pauses, fillers cuts um, uh and stutters, retakes keeps the last take of a restarted sentence, zoom punches in on the jump cuts, norm levels the volume to -14 LUFS. all turns on every one. Captions, subtitles and overlays follow the cut." },
 };
 const JOB = {
   path: { type: "string", description: "Absolute path to the video or audio file: MP4, MOV, WebM, MP3, WAV, M4A or another format the studio opens." },
@@ -41,7 +42,7 @@ export const TOOLS = [
   },
   {
     name: "studio_link",
-    description: "Returns a URL to the Cuecaps studio, opened with these caption settings, for the user to finish in their browser: they drop in the video, can fix words and export there. Creates nothing and needs no key, so it works on every plan, Free included. Use it when the user wants to edit by hand, has no Creator or Pro key, or the file isn't on this machine; use caption_video to make the file directly.",
+    description: "Returns a URL to the Cuecaps studio, opened with these caption settings, for the user to finish in their browser: they drop in the video, can fix words and export there. With fast, the studio also turns on Fast edit as soon as the words are found, so \"cut my pauses and caption this\" is one link. Creates nothing and needs no key, so it works on every plan, Free included; exporting with Fast edit comes with Creator and Pro. Use it when the user wants to edit by hand, has no Creator or Pro key, or the file isn't on this machine; use caption_video to make the file directly.",
     inputSchema: schema(LINK),
     annotations: annotations("Make a studio link", { readOnly: true, idempotent: true, network: false }),
   },
@@ -59,7 +60,7 @@ export const TOOLS = [
   },
   {
     name: "caption_video",
-    description: "Captions a local video or audio file with the Cuecaps studio's renderer in headless Chrome or Edge and writes <name>.captions.<ext> next to it, never replacing a file: an MP4 with the captions burned in, a transparent MOV or WebM overlay, or SRT or VTT subtitles. Returns the file, its duration in seconds, the engine, the cloud minutes used and a studio link to fine-tune words and style. Needs a Creator or Pro key; 1440p and 4K need Pro. Transcription works as in transcribe, and the video never leaves this machine. Use transcribe when only the words are needed, and studio_link when the user wants to edit by hand or has no key.",
+    description: "Captions a local video or audio file with the Cuecaps studio's renderer in headless Chrome or Edge and writes <name>.captions.<ext> next to it, never replacing a file: an MP4 with the captions burned in, a transparent MOV or WebM overlay, or SRT or VTT subtitles. With fast, Fast edit cuts dead space, filler words and retakes, punches in on the jump cuts and levels the volume before it renders. Returns the file, the input's duration in seconds, the engine, the cloud minutes used and a studio link to fine-tune words, cuts and style. Needs a Creator or Pro key; 1440p and 4K need Pro. Transcription works as in transcribe, and the video never leaves this machine. Use transcribe when only the words are needed, and studio_link when the user wants to edit by hand or has no key.",
     annotations: annotations("Caption a video", { readOnly: false, idempotent: false, network: true }),
     inputSchema: schema({
       ...JOB, ...LINK,
@@ -81,7 +82,10 @@ function invalid(name, { properties, required = [] }, args) {
     if (!p) return `${name} takes ${Object.keys(properties).join(", ") || "no inputs"}, not ${k}.`;
     if (p.enum) { if (!p.enum.includes(v)) return `${k} must be one of: ${p.enum.join(", ")}.`; }
     else if (p.type === "integer") { if (!Number.isInteger(v) || v < p.minimum || v > p.maximum) return `${k} must be a whole number from ${p.minimum} to ${p.maximum}.`; }
-    else if (p.type === "array") { if (!Array.isArray(v) || v.length > p.maxItems || !v.every((s) => typeof s === "string" && s.length <= p.items.maxLength)) return `${k} must be a list of up to ${p.maxItems} terms of up to ${p.items.maxLength} characters.`; }
+    else if (p.type === "array") {
+      const fits = (s) => typeof s === "string" && (p.items.enum ? p.items.enum.includes(s) : s.length <= p.items.maxLength);
+      if (!Array.isArray(v) || v.length > p.maxItems || !v.every(fits)) return p.items.enum ? `${k} must be a list of: ${p.items.enum.join(", ")}.` : `${k} must be a list of up to ${p.maxItems} terms of up to ${p.items.maxLength} characters.`;
+    }
     else if (typeof v !== "string") return `${k} must be a string.`;
   }
 }

@@ -318,11 +318,26 @@ test("studio texts the agent can act on get the package's wording; others pass t
 
 test("arguments outside the schema are refused before any work", async () => {
   const { call, calls } = setup();
-  for (const args of [{ path: INPUT, words: 11 }, { path: INPUT, style: "neon" }, { path: INPUT, fps: 29 }, { path: INPUT, colour: "red" }, {}]) {
+  for (const args of [{ path: INPUT, words: 11 }, { path: INPUT, style: "neon" }, { path: INPUT, fps: 29 }, { path: INPUT, colour: "red" }, {}, { path: INPUT, fast: "all" }, { path: INPUT, fast: ["warp"] }]) {
     const r = await call("caption_video", args);
     assert.equal(r.isError, true, JSON.stringify(args));
   }
+  assert.match((await call("caption_video", { path: INPUT, fast: ["zoom", "warp"] })).text, /fast must be a list of: all, deadspace, fillers, retakes, zoom, norm\./);
+  assert.match((await call("transcribe", { path: INPUT, fast: ["all"] })).text, /transcribe takes .*, not fast\./);
   assert.equal(calls.fetchMe.length, 0);
+});
+
+test("fast puts Fast edit tools in the studio link, and caption_video's studio turns them on before it renders", async () => {
+  const tools = handlers({ env: {}, fetchMe: never, withStudio: never, open: never, unlink: never, exists: () => false });
+  const link = async (args) => JSON.parse((await tools.studio_link(args, {})).text).url;
+  assert.equal(await link({ style: "bold", fast: ["all"] }), "https://cuecaps.com/studio?style=bold&fast=all");
+  assert.equal(await link({ fast: ["norm", "deadspace", "norm"] }), "https://cuecaps.com/studio?fast=deadspace%2Cnorm");
+  assert.equal(await link({ fast: ["deadspace", "fillers", "retakes", "zoom", "norm"] }), "https://cuecaps.com/studio?fast=all");
+  assert.equal(await link({ style: "bold", fast: [] }), "https://cuecaps.com/studio?style=bold");
+  const { call, calls } = setup();
+  const r = await call("caption_video", { path: INPUT, style: "bold", fast: ["deadspace", "fillers"] });
+  assert.ok(!r.isError, r.text);
+  assert.equal(calls.withStudio[0].query, "style=bold&fast=deadspace%2Cfillers");
 });
 
 test("transcribe returns timed words and SRT; account_status reads the summary", async () => {

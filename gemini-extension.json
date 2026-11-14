@@ -1,0 +1,11 @@
+{
+  "name": "cuecaps",
+  "version": "0.2.0",
+  "description": "Animated word-by-word captions for TikTok, YouTube Shorts and Reels. Hosted Cuecaps MCP server: no install, no key.",
+  "mcpServers": {
+    "cuecaps": {
+      "httpUrl": "https://cuecaps.com/mcp"
+    }
+  },
+  "contextFileName": "GEMINI.md"
+}

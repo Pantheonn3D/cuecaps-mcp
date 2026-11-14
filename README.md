@@ -1,7 +1,8 @@
 # cuecaps-mcp
 
 Caption a video or audio file on your computer from Claude Code, Cursor, Claude Desktop or any MCP client. Ask "caption
-talk.mp4 in Karaoke and give me the MP4" and `talk.captions.mp4` lands next to the original. The server drives the
+talk.mp4 in Karaoke and give me the MP4" and `talk.captions.mp4` lands next to the original. Ask it to cut the pauses
+too, and Fast edit trims the dead space, filler words and retakes before the captions render. The server drives the
 Cuecaps studio's own export in headless Chrome or Edge on your machine, so the result matches a studio export of the same
 settings. Once the project syncs to your account, `caption_video` also returns a studio link that opens it, to fix a word
 or change the style.
@@ -16,7 +17,27 @@ use this package (below).
 
 - claude.ai: Settings, Connectors, Add custom connector, and paste `https://cuecaps.com/mcp`.
 - Claude Code: `claude mcp add --transport http cuecaps https://cuecaps.com/mcp`
-- Gemini CLI, in `~/.gemini/settings.json`: `{ "mcpServers": { "cuecaps": { "httpUrl": "https://cuecaps.com/mcp" } } }`
+- Cursor: [Add to Cursor](https://cursor.com/en/install-mcp?name=cuecaps&config=eyJ1cmwiOiJodHRwczovL2N1ZWNhcHMuY29tL21jcCJ9)
+- VS Code: [Install in VS Code](https://insiders.vscode.dev/redirect/mcp/install?name=cuecaps&config=%7B%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Fcuecaps.com%2Fmcp%22%7D)
+- Gemini CLI: `gemini extensions install https://github.com/Pantheonn3D/cuecaps-mcp`, or in `~/.gemini/settings.json`:
+  `{ "mcpServers": { "cuecaps": { "httpUrl": "https://cuecaps.com/mcp" } } }`
+- Codex CLI, in `~/.codex/config.toml`: `[mcp_servers.cuecaps]` then `url = "https://cuecaps.com/mcp"`
+- goose: open `goose://extension?url=https%3A%2F%2Fcuecaps.com%2Fmcp&type=streamable_http&id=cuecaps&name=Cuecaps&description=Animated%20word-by-word%20captions`
+  in your browser, or add a Remote Extension (Streamable HTTP) with the URL above.
+- Continue, in `.continue/mcpServers/cuecaps.yaml`:
+
+  ```yaml
+  name: Cuecaps
+  version: 0.0.1
+  schema: v1
+  mcpServers:
+    - name: Cuecaps
+      type: streamable-http
+      url: https://cuecaps.com/mcp
+  ```
+
+- Cline: Settings, MCP Servers, Remote Servers, with the URL above. Agents setting it up can follow
+  [llms-install.md](llms-install.md).
 
 Setup for every client: [cuecaps.com/ai-assistants](https://cuecaps.com/ai-assistants).
 
@@ -60,6 +81,12 @@ Every input except `path` is optional. The caption settings use the studio-link 
 `lines` (1 or 2), `position` (`top`, `middle`, `bottom`), `aspect` (`9:16`, `1:1`, `4:5`, `16:9`) and `lang` (a language
 code such as `es`; `auto` lets cloud transcription detect it). Each tool's schema lists the valid values.
 
+`studio_link` and `caption_video` also take `fast`, the Fast edit tools to turn on once the words are found:
+`deadspace` cuts the pauses, `fillers` cuts um, uh and stutters, `retakes` keeps the last take of a restarted sentence,
+`zoom` punches in on the jump cuts and `norm` levels the volume to -14 LUFS. `["all"]` turns on all five. In
+`caption_video` the file is cut before it renders, and SRT, VTT and overlay timings follow the cut. A studio link with
+`fast` works on every plan; exporting with Fast edit comes with Creator and Pro.
+
 `transcribe` and `caption_video` also take:
 
 - `engine`: `cloud` is ElevenLabs Scribe on your plan's cloud minutes, strongest on music, accents and 90+ languages, and
@@ -93,6 +120,13 @@ Returns `[{ "id": "bold", "name": "Bold", "look": "Montserrat in capitals with a
 
 Returns `{ "url": "https://cuecaps.com/studio?style=karaoke&words=4&aspect=9%3A16" }`.
 
+```json
+{ "style": "bold", "fast": ["all"] }
+```
+
+Returns `{ "url": "https://cuecaps.com/studio?style=bold&fast=all" }`: the studio cuts the dead space, filler words and
+retakes, adds the jump-cut zoom and levels the volume as soon as the words are found.
+
 `account_status`
 
 ```json
@@ -112,7 +146,7 @@ Returns `{ "words": [{ "text": "Greetings!", "start": 0.48, "end": 1.84 }, …],
 `caption_video`
 
 ```json
-{ "path": "/Users/ana/clips/talk.mp4", "style": "karaoke", "aspect": "9:16" }
+{ "path": "/Users/ana/clips/talk.mp4", "style": "karaoke", "aspect": "9:16", "fast": ["deadspace", "fillers"] }
 ```
 
 Returns `{ "file": "/Users/ana/clips/talk.captions.mp4", "duration": 17.17, "engine": "cloud", "minutes_used": 0.29, "studio_url": "https://cuecaps.com/studio#p=…" }`.

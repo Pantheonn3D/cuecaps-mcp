@@ -1,6 +1,6 @@
 // The studio-link vocabulary. This package is published on its own, so it holds copies of what the studio and the site
-// define: STYLES is PRESET_NOTES in lib/presets.ts (look = its note), LANGS and the aspects are in studio-src/10-core.js.
-// test/vocab.test.mjs fails when a copy drifts.
+// define: STYLES is PRESET_NOTES in lib/presets.ts (look = its note), LANGS and the aspects are in studio-src/10-core.js,
+// FAST is FAST_TOOLS in studio-src/10-pure.js. test/vocab.test.mjs fails when a copy drifts.
 export const STYLES = [
   { id: "bold", name: "Bold", look: "Montserrat in capitals with a black outline, up to three words at a time. The spoken word turns yellow and each caption pops in." },
   { id: "clean", name: "Clean", look: "TikTok Sans in normal case, one word at a time, with a soft shadow and no outline." },
@@ -15,10 +15,12 @@ export const STYLES = [
 ];
 export const LANGS = [
   "auto", "en", "es", "pt", "fr", "de", "it", "nl", "da", "sv", "no", "fi", "pl",
-  "tr", "ru", "uk", "ar", "hi", "id", "vi", "ja", "ko", "zh",
+  "tr", "ru", "uk", "ar", "hi", "id", "vi", "ja", "ko", "zh", "bn", "cs", "tl", "el", "he", "hu", "ms", "fa", "ro", "ta", "th", "ur",
 ];
 export const ASPECTS = ["9:16", "1:1", "4:5", "16:9"];
 export const POSITIONS = ["top", "middle", "bottom"];
+// The Fast edit tools a studio link turns on once the words are found, in the studio's order.
+export const FAST = ["deadspace", "fillers", "retakes", "zoom", "norm"];
 export const OUTPUTS = ["mp4", "mov", "webm", "srt", "vtt"];
 // Export resolutions by short side in pixels, and the frame rates the studio offers.
 export const RESOLUTIONS = { "720p": 720, "1080p": 1080, "1440p": 1440, "4k": 2160 };

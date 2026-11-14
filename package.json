@@ -1,6 +1,6 @@
 {
   "name": "cuecaps-mcp",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "mcpName": "io.github.Pantheonn3D/cuecaps-mcp",
   "description": "Caption video and audio files with Cuecaps from any MCP client, rendered on your computer. Hosted, no install: https://cuecaps.com/mcp",
   "keywords": [
