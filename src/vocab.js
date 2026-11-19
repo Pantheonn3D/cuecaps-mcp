@@ -22,6 +22,13 @@ export const POSITIONS = ["top", "middle", "bottom"];
 // The Fast edit tools a studio link turns on once the words are found, in the studio's order.
 export const FAST = ["deadspace", "fillers", "retakes", "zoom", "norm"];
 export const OUTPUTS = ["mp4", "mov", "webm", "srt", "vtt"];
+// The look a link sets on top of the style: FONTS in studio-src/10-core.js, and the names linkSettings in 10-pure.js
+// reads for colors, how the spoken word is marked, the entrance animation and letter case.
+export const FONTS = ["TikTok Sans", "Montserrat", "Poppins", "Inter", "Nunito", "Rubik", "Outfit", "Sora", "League Spartan", "Bricolage Grotesque", "Unbounded", "Kanit", "Space Grotesk", "Archivo Black", "Anton", "Bebas Neue", "Oswald", "Luckiest Guy", "Bangers", "Lilita One", "Titan One", "Permanent Marker", "Instrument Serif", "DM Serif Display"];
+export const COLOR_NAMES = ["white", "black", "yellow", "gold", "orange", "red", "pink", "purple", "blue", "cyan", "green", "lime"];
+export const MARKS = ["color", "box", "grow", "dim", "reveal", "none"];
+export const ANIMS = ["pop", "punch", "bounce", "rise", "slide", "fade", "focus", "typewriter", "none"];
+export const CASES = ["upper", "lower", "as-spoken"];
 // Export resolutions by short side in pixels, and the frame rates the studio offers.
 export const RESOLUTIONS = { "720p": 720, "1080p": 1080, "1440p": 1440, "4k": 2160 };
 export const FPS = [24, 25, 30, 50, 60];

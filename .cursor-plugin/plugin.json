@@ -1,7 +1,7 @@
 {
   "name": "cuecaps",
   "displayName": "Cuecaps",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Animated word-by-word captions for TikTok, YouTube Shorts and Reels, plus Fast edit cuts for dead space, filler words and retakes. Hosted MCP server, no key needed.",
   "author": {
     "name": "Cuecaps",

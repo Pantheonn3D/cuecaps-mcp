@@ -330,14 +330,32 @@ test("arguments outside the schema are refused before any work", async () => {
 test("fast puts Fast edit tools in the studio link, and caption_video's studio turns them on before it renders", async () => {
   const tools = handlers({ env: {}, fetchMe: never, withStudio: never, open: never, unlink: never, exists: () => false });
   const link = async (args) => JSON.parse((await tools.studio_link(args, {})).text).url;
-  assert.equal(await link({ style: "bold", fast: ["all"] }), "https://cuecaps.com/studio?style=bold&fast=all");
-  assert.equal(await link({ fast: ["norm", "deadspace", "norm"] }), "https://cuecaps.com/studio?fast=deadspace%2Cnorm");
-  assert.equal(await link({ fast: ["deadspace", "fillers", "retakes", "zoom", "norm"] }), "https://cuecaps.com/studio?fast=all");
-  assert.equal(await link({ style: "bold", fast: [] }), "https://cuecaps.com/studio?style=bold");
+  assert.equal(await link({ style: "bold", fast: ["all"] }), "https://cuecaps.com/studio?style=bold&fast=all&src=assistant");
+  assert.equal(await link({ fast: ["norm", "deadspace", "norm"] }), "https://cuecaps.com/studio?fast=deadspace%2Cnorm&src=assistant");
+  assert.equal(await link({ fast: ["deadspace", "fillers", "retakes", "zoom", "norm"] }), "https://cuecaps.com/studio?fast=all&src=assistant");
+  assert.equal(await link({ style: "bold", fast: [] }), "https://cuecaps.com/studio?style=bold&src=assistant");
   const { call, calls } = setup();
   const r = await call("caption_video", { path: INPUT, style: "bold", fast: ["deadspace", "fillers"] });
   assert.ok(!r.isError, r.text);
   assert.equal(calls.withStudio[0].query, "style=bold&fast=deadspace%2Cfillers");
+});
+
+test("the look the user describes goes into the link and into caption_video's studio", async () => {
+  const tools = handlers({ env: {}, fetchMe: never, withStudio: never, open: never, unlink: never, exists: () => false });
+  const link = async (args) => (await tools.studio_link(args, {})).text;
+  assert.equal(JSON.parse(await link({ style: "bold", font: "Bebas Neue", highlight: "#FFE14D", color: "White", mark: "grow", anim: "bounce", case: "upper", size: 125, voice: true })).url,
+    "https://cuecaps.com/studio?style=bold&font=Bebas+Neue&color=white&highlight=ffe14d&mark=grow&anim=bounce&case=upper&size=125&voice=1&src=assistant");
+  assert.equal(JSON.parse(await link({ voice: false })).url, "https://cuecaps.com/studio?src=assistant");
+  for (const [args, says] of [[{ font: "Comic Sans" }, /font must be one of/], [{ color: "chartreuse" }, /color must be a hex color/], [{ highlight: "#12345" }, /highlight must be a hex color/],
+    [{ size: 300 }, /from 50 to 200/], [{ voice: "yes" }, /voice must be true or false/], [{ anim: "spin" }, /anim must be one of/]]) {
+    const r = await tools.studio_link(args, {});
+    assert.equal(r.isError, true, JSON.stringify(args));
+    assert.match(r.text, says);
+  }
+  const { call, calls } = setup();
+  assert.ok(!(await call("caption_video", { path: INPUT, style: "comic", font: "Anton", highlight: "red", size: 80 })).isError);
+  assert.equal(calls.withStudio[0].query, "style=comic&font=Anton&highlight=red&size=80");
+  assert.match((await call("caption_video", { path: INPUT, voice: true })).text, /caption_video takes .*, not voice\./);
 });
 
 test("transcribe returns timed words and SRT; account_status reads the summary", async () => {

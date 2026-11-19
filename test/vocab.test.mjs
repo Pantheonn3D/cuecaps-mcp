@@ -3,7 +3,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { STYLES, LANGS, ASPECTS, FAST } from "../src/vocab.js";
+import { STYLES, LANGS, ASPECTS, FAST, FONTS } from "../src/vocab.js";
 
 test("vocab matches the studio and the site", () => {
   const presets = readFileSync("lib/presets.ts", "utf8"), core = readFileSync("studio-src/10-core.js", "utf8"), pure = readFileSync("studio-src/10-pure.js", "utf8");
@@ -13,4 +13,6 @@ test("vocab matches the studio and the site", () => {
   assert.deepEqual(LANGS, [...langs.matchAll(/\["([a-z]+)",/g)].map((m) => m[1]));
   const aspects = core.match(/const ASPECTS = \{([^}]*)\}/)[1];
   assert.deepEqual([...ASPECTS].sort(), [...aspects.matchAll(/"(\d+:\d+)"/g)].map((m) => m[1]).sort());
+  const fonts = core.slice(core.indexOf("const FONTS"), core.indexOf("];", core.indexOf("const FONTS")));
+  assert.deepEqual(FONTS, [...fonts.matchAll(/name: "([^"]+)"/g)].map((m) => m[1]));
 });

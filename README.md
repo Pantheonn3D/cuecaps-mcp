@@ -89,6 +89,15 @@ code such as `es`; `auto` lets cloud transcription detect it). Each tool's schem
 `caption_video` the file is cut before it renders, and SRT, VTT and overlay timings follow the cut. A studio link with
 `fast` works on every plan; exporting with Fast edit comes with Creator and Pro.
 
+Both also take the look the user describes, on top of the style, so the captions come out the way they asked:
+`font` (any of the studio's 24 fonts, such as `Bebas Neue`), `color` (the text), `highlight` (the word being spoken)
+and `emphasis` (key words), each as a hex value or `white`, `black`, `yellow`, `gold`, `orange`, `red`, `pink`,
+`purple`, `blue`, `cyan`, `green` or `lime`; `mark` (`color`, `box`, `grow`, `dim`, `reveal` or `none`); `anim`
+(`pop`, `punch`, `bounce`, `rise`, `slide`, `fade`, `focus`, `typewriter` or `none`); `case` (`upper`, `lower` or
+`as-spoken`) and `size` (50 to 200, a percent of the style's size). `studio_link` also takes `voice: true`, which
+removes background noise from the voice once the words are found (Chrome or Edge on a computer). Its links end in
+`src=assistant`, so the studio opens with a preview of the captions in that look and says the assistant set it up.
+
 `transcribe` and `caption_video` also take:
 
 - `engine`: `cloud` is ElevenLabs Scribe on your plan's cloud minutes, strongest on music, accents and 90+ languages, and
@@ -120,14 +129,21 @@ Returns `[{ "id": "bold", "name": "Bold", "look": "Montserrat in capitals with a
 { "style": "karaoke", "words": 4, "aspect": "9:16" }
 ```
 
-Returns `{ "url": "https://cuecaps.com/studio?style=karaoke&words=4&aspect=9%3A16" }`.
+Returns `{ "url": "https://cuecaps.com/studio?style=karaoke&words=4&aspect=9%3A16&src=assistant" }`.
 
 ```json
 { "style": "bold", "fast": ["all"] }
 ```
 
-Returns `{ "url": "https://cuecaps.com/studio?style=bold&fast=all" }`: the studio cuts the dead space, filler words and
-retakes, adds the jump-cut zoom and levels the volume as soon as the words are found.
+Returns `{ "url": "https://cuecaps.com/studio?style=bold&fast=all&src=assistant" }`: the studio cuts the dead space,
+filler words and retakes, adds the jump-cut zoom and levels the volume as soon as the words are found.
+
+```json
+{ "style": "bold", "font": "Bebas Neue", "highlight": "yellow", "anim": "bounce", "voice": true }
+```
+
+Returns a link that opens with yellow-highlighted Bebas Neue captions bouncing in, and removes the background noise
+once the words are found.
 
 `account_status`
 

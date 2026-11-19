@@ -2,7 +2,7 @@
 // their deps injected ({ env, fetchMe, withStudio, open, unlink, exists }), so tests run with no browser; server.js passes
 // the real ones.
 import { basename, dirname, extname, isAbsolute } from "node:path";
-import { STYLES, LANGS, ASPECTS, POSITIONS, FAST, OUTPUTS, RESOLUTIONS, FPS } from "./vocab.js";
+import { STYLES, LANGS, ASPECTS, POSITIONS, FAST, OUTPUTS, RESOLUTIONS, FPS, FONTS, COLOR_NAMES, MARKS, ANIMS, CASES } from "./vocab.js";
 import { studioLink, studioQuery } from "./link.js";
 import { freePath, outputPath } from "./paths.js";
 import { message } from "./errors.js";
@@ -12,6 +12,8 @@ import { message } from "./errors.js";
 // studio's own MB of 1,048,576 bytes (its download status in 18-transcribe.js).
 const MODEL_MB = 132;
 
+// A hex color (# optional) or one of the names the studio reads, in any letter case.
+const COLOR = `^(#?([0-9a-fA-F]{3}|[0-9a-fA-F]{6})|${COLOR_NAMES.map((n) => n.replace(/./g, (c) => `[${c}${c.toUpperCase()}]`)).join("|")})$`;
 const LINK = {
   style: { type: "string", enum: STYLES.map((s) => s.id), description: "Caption style. list_styles shows how each one looks." },
   words: { type: "integer", minimum: 1, maximum: 10, description: "Words per caption; 1 shows one word at a time." },
@@ -20,6 +22,15 @@ const LINK = {
   aspect: { type: "string", enum: ASPECTS, description: "Frame shape: 9:16 for TikTok, Shorts and Reels, 1:1 or 4:5 for feed posts, 16:9 for YouTube." },
   lang: { type: "string", enum: LANGS, description: "The spoken language. Give it for any video that isn't in English; auto lets cloud transcription detect it." },
   fast: { type: "array", items: { type: "string", enum: ["all", ...FAST] }, maxItems: FAST.length + 1, description: "Fast edit tools to turn on once the words are found: deadspace cuts the pauses, fillers cuts um, uh and stutters, retakes keeps the last take of a restarted sentence, zoom punches in on the jump cuts, norm levels the volume to -14 LUFS. all turns on every one. Captions, subtitles and overlays follow the cut." },
+  // The look on top of the style: everything the user describes goes in, so the captions come out as they asked.
+  font: { type: "string", enum: FONTS, description: "Caption font, in place of the style's own." },
+  color: { type: "string", pattern: COLOR, description: `Text color: a hex value such as #FFFFFF, or ${COLOR_NAMES.join(", ")}.` },
+  highlight: { type: "string", pattern: COLOR, description: "Color of the word being spoken, as a hex value or a color name. A style that doesn't color the spoken word starts to." },
+  emphasis: { type: "string", pattern: COLOR, description: "Color of the key words the studio picks for emphasis, as a hex value or a color name." },
+  mark: { type: "string", enum: MARKS, description: "How the spoken word stands out: color it, a box behind it, grow it, dim the words not yet spoken, reveal words as they are spoken, or none." },
+  anim: { type: "string", enum: ANIMS, description: "How each caption comes in: pop, punch (slams down from large), bounce, rise, slide, fade, focus (from a blur), typewriter (letter by letter) or none." },
+  case: { type: "string", enum: CASES, description: "Letter case: upper for capitals, lower, or as-spoken." },
+  size: { type: "integer", minimum: 50, maximum: 200, description: "Caption size as a percent of the style's own: 125 for bigger, 80 for smaller." },
 };
 const JOB = {
   path: { type: "string", description: "Absolute path to the video or audio file: MP4, MOV, WebM, MP3, WAV, M4A or another format the studio opens." },
@@ -42,8 +53,12 @@ export const TOOLS = [
   },
   {
     name: "studio_link",
-    description: "Returns a URL to the Cuecaps studio, opened with these caption settings, for the user to finish in their browser: they drop in the video, can fix words and export there. With fast, the studio also turns on Fast edit as soon as the words are found, so \"cut my pauses and caption this\" is one link. Creates nothing and needs no key, so it works on every plan, Free included; exporting with Fast edit comes with Creator and Pro. Use it when the user wants to edit by hand, has no Creator or Pro key, or the file isn't on this machine; use caption_video to make the file directly.",
-    inputSchema: schema(LINK),
+    description: "Returns a URL to the Cuecaps studio, opened set up exactly as the user described (style, font, colors, how the spoken word stands out, animation, size, format and language), for the user to finish in their browser: they drop in the video, can fix words and export there. With fast, the studio also turns on Fast edit as soon as the words are found, so \"cut my pauses and caption this\" is one link. Creates nothing and needs no key, so it works on every plan, Free included; exporting with Fast edit comes with Creator and Pro. Use it when the user wants to edit by hand, has no Creator or Pro key, or the file isn't on this machine; use caption_video to make the file directly.",
+    inputSchema: schema({
+      ...LINK,
+      // Only in the link: Clean up voice runs on a graphics card, which the headless studio of caption_video doesn't have.
+      voice: { type: "boolean", description: "true removes background noise, music and room sound from the voice once the words are found (Clean up voice, a Fast edit tool; Chrome or Edge on a computer, after a one-time 130 MB download)." },
+    }),
     annotations: annotations("Make a studio link", { readOnly: true, idempotent: true, network: false }),
   },
   {
@@ -86,7 +101,9 @@ function invalid(name, { properties, required = [] }, args) {
       const fits = (s) => typeof s === "string" && (p.items.enum ? p.items.enum.includes(s) : s.length <= p.items.maxLength);
       if (!Array.isArray(v) || v.length > p.maxItems || !v.every(fits)) return p.items.enum ? `${k} must be a list of: ${p.items.enum.join(", ")}.` : `${k} must be a list of up to ${p.maxItems} terms of up to ${p.items.maxLength} characters.`;
     }
+    else if (p.type === "boolean") { if (typeof v !== "boolean") return `${k} must be true or false.`; }
     else if (typeof v !== "string") return `${k} must be a string.`;
+    else if (p.pattern && !new RegExp(p.pattern).test(v)) return `${k} must be a hex color such as #FFE14D, or one of: ${COLOR_NAMES.join(", ")}.`;
   }
 }
 

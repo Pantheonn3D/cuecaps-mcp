@@ -26,6 +26,11 @@ rendered on the user's machine, never uploaded.
 - `lang`: the spoken language code for anything not in English.
 - `fast`: `deadspace` (pauses), `fillers` (um, uh, stutters), `retakes` (keeps the last take), `zoom` (punch-in on
   jump cuts), `norm` (-14 LUFS), or `["all"]`.
+- The look, on top of the style, so the captions come out as the user described them: `font` (one of 24, such as
+  `Bebas Neue`), `color` (text), `highlight` (the spoken word) and `emphasis` (key words) as hex or a color name,
+  `mark` (`color`, `box`, `grow`, `dim`, `reveal`, `none`), `anim` (`pop`, `punch`, `bounce`, `rise`, `slide`,
+  `fade`, `focus`, `typewriter`, `none`), `case` (`upper`, `lower`, `as-spoken`) and `size` (50 to 200 percent).
+- `voice: true` (`studio_link` only): removes background noise once the words are found.
 - `output` (local only): `mp4` burned in, `mov` or `webm` transparent overlay for an editor, `srt` or `vtt`.
 - In the studio (the `studio_link` route), Export also offers ASS karaoke subtitles (word-by-word timing for FFmpeg,
   mpv, VLC and Aegisub) and, with Fast edit on, an EDL or FCPXML cut list that rebuilds the cut on the original
@@ -36,3 +41,5 @@ rendered on the user's machine, never uploaded.
 - "Caption talk.mp4 for TikTok and cut the pauses" -> `caption_video { path, aspect: "9:16", fast: ["deadspace"] }`
 - "I need an overlay for Resolve" -> `caption_video { path, output: "mov" }`
 - "Karaoke captions on a Spanish Short" (hosted) -> `studio_link { style: "karaoke", lang: "es", aspect: "9:16" }`
+- "Yellow Bebas captions that bounce in, and clean up the noise" -> `studio_link { style: "bold", font: "Bebas Neue",
+  highlight: "yellow", anim: "bounce", voice: true }`

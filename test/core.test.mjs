@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import vm from "node:vm";
-import { STYLES, ASPECTS, LANGS, FAST } from "../src/vocab.js";
+import { STYLES, ASPECTS, LANGS, FAST, FONTS, COLOR_NAMES, MARKS, ANIMS, CASES } from "../src/vocab.js";
 import { studioQuery, studioLink } from "../src/link.js";
 import { outputPath } from "../src/paths.js";
 import { message } from "../src/errors.js";
@@ -23,7 +23,19 @@ test("tool arguments become a studio query that linkSettings reads back unchange
   assert.deepEqual(plain(pure.linkSettings(new URLSearchParams(studioQuery(args)), OK)),
     { preset: "karaoke", words: 4, lines: 2, position: "top", aspect: "1:1", lang: "es" });
   assert.equal(studioQuery({}), "");
-  assert.equal(studioLink("https://cuecaps.com", { style: "bold", words: 1 }), "https://cuecaps.com/studio?style=bold&words=1");
+  assert.equal(studioLink("https://cuecaps.com", { style: "bold", words: 1 }), "https://cuecaps.com/studio?style=bold&words=1&src=assistant");
+  assert.equal(studioLink("https://cuecaps.com", {}), "https://cuecaps.com/studio?src=assistant");
+});
+
+test("the look reaches the studio as the settings asked for", () => {
+  const fonts = FONTS, read = (args) => plain(pure.linkSettings(new URLSearchParams(studioQuery(args)), { ...OK, fonts }));
+  assert.deepEqual(read({ font: "Bebas Neue", color: "#FFFFFF", highlight: "yellow", emphasis: "f0f", mark: "grow", anim: "typewriter", case: "as-spoken", size: 140, voice: true }),
+    { font: "Bebas Neue", color: "#FFFFFF", highlight: "#FFE14D", emphasis: "#FF00FF", mark: "scale", anim: "type", case: "none", size: 140, voice: true });
+  for (const m of MARKS) assert.ok(read({ mark: m }).mark, m);
+  for (const a of ANIMS) assert.ok(read({ anim: a }).anim, a);
+  for (const k of CASES) assert.ok(read({ case: k }).case, k);
+  for (const n of COLOR_NAMES) assert.ok(read({ color: n }).color, n);
+  for (const f of FONTS) assert.equal(read({ font: f }).font, f);
 });
 
 test("fast reaches the studio as the Fast edit tools to turn on", () => {
