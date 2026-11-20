@@ -101,8 +101,8 @@ removes background noise from the voice once the words are found (Chrome or Edge
 `transcribe` and `caption_video` also take:
 
 - `engine`: `cloud` is ElevenLabs Scribe on your plan's cloud minutes, strongest on music, accents and 90+ languages, and
-  the default when the minutes left cover the file. `device` is on-device Whisper with no minutes; its first run
-  downloads the model (132 MB). The result names the engine used.
+  the default when the minutes left cover the file. `device` is on-device Fluid Speech Pro (Whisper base for the languages it lacks) with no minutes; its first run
+  downloads the model (764 MB). The result names the engine used.
 - `keyterms`: up to 100 names and words for cloud transcription to spell your way.
 
 `caption_video` also takes:
