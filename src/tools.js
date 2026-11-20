@@ -7,10 +7,11 @@ import { studioLink, studioQuery } from "./link.js";
 import { freePath, outputPath } from "./paths.js";
 import { message } from "./errors.js";
 
-// What the on-device engine downloads on its first run: the config and tokenizer files plus the WASM set (encoder fp32,
-// decoder q8) of the studio's pinned Whisper model, 138,934,000 bytes by HEAD request on 2026-10-28, counted in the
-// studio's own MB of 1,048,576 bytes (its download status in 18-transcribe.js).
-const MODEL_MB = 132;
+// What the on-device engine downloads on its first run: the studio's default model, Fluid Speech Pro (8-bit encoder and
+// decoder with their weights, and the vocabulary), 800,847,173 bytes on 2026-11-20 (model-archive/MANIFEST.json),
+// counted in the studio's own MB of 1,048,576 bytes (its download status in 18-transcribe.js). Languages it doesn't
+// have use Whisper base instead, which is smaller.
+const MODEL_MB = 764;
 
 // A hex color (# optional) or one of the names the studio reads, in any letter case.
 const COLOR = `^(#?([0-9a-fA-F]{3}|[0-9a-fA-F]{6})|${COLOR_NAMES.map((n) => n.replace(/./g, (c) => `[${c}${c.toUpperCase()}]`)).join("|")})$`;
@@ -35,7 +36,7 @@ const LINK = {
 const JOB = {
   path: { type: "string", description: "Absolute path to the video or audio file: MP4, MOV, WebM, MP3, WAV, M4A or another format the studio opens." },
   lang: LINK.lang,
-  engine: { type: "string", enum: ["cloud", "device"], description: `cloud: ElevenLabs Scribe on the plan's cloud minutes, strongest on music, accents and 90+ languages; the default when the minutes left cover the file. device: on-device Whisper, no minutes; the first run downloads the model (${MODEL_MB} MB).` },
+  engine: { type: "string", enum: ["cloud", "device"], description: `cloud: ElevenLabs Scribe on the plan's cloud minutes, strongest on music, accents and 90+ languages; the default when the minutes left cover the file. device: on-device Fluid Speech Pro (Whisper base for the languages it lacks), no minutes; the first run downloads the model (${MODEL_MB} MB).` },
   keyterms: { type: "array", items: { type: "string", maxLength: 50 }, maxItems: 100, description: "Names and words for cloud transcription to spell your way." },
 };
 const EXTS = OUTPUTS.map((o) => `.${o}`).join(", ").replace(/, ([^,]+)$/, " or $1"); // ".mp4, .mov, .webm, .srt or .vtt"
