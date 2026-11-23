@@ -91,7 +91,8 @@ test("studio_link and list_styles need no key", async () => {
   const link = await tools.studio_link({ style: "karaoke" }, {});
   assert.ok(!link.isError && link.text.includes("https://cuecaps.com/studio?style=karaoke"), link.text);
   const styles = JSON.parse((await tools.list_styles({}, {})).text);
-  assert.equal(styles.length, 10);
+  assert.equal(styles.length, 18);
+  assert.deepEqual(styles.filter((s) => s.creator).map((s) => s.id), ["spotlight", "hype", "sweep", "neon", "retro"]);
   assert.deepEqual(Object.keys(styles[0]), ["id", "name", "look"]);
 });
 
@@ -318,7 +319,7 @@ test("studio texts the agent can act on get the package's wording; others pass t
 
 test("arguments outside the schema are refused before any work", async () => {
   const { call, calls } = setup();
-  for (const args of [{ path: INPUT, words: 11 }, { path: INPUT, style: "neon" }, { path: INPUT, fps: 29 }, { path: INPUT, colour: "red" }, {}, { path: INPUT, fast: "all" }, { path: INPUT, fast: ["warp"] }]) {
+  for (const args of [{ path: INPUT, words: 11 }, { path: INPUT, style: "sparkle" }, { path: INPUT, fps: 29 }, { path: INPUT, colour: "red" }, {}, { path: INPUT, fast: "all" }, { path: INPUT, fast: ["warp"] }]) {
     const r = await call("caption_video", args);
     assert.equal(r.isError, true, JSON.stringify(args));
   }

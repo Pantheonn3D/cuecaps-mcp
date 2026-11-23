@@ -73,7 +73,7 @@ the key filled in.
 
 | Tool | Key | What it does |
 |---|---|---|
-| `list_styles` | no | The 10 caption styles: id, name and how each one looks. |
+| `list_styles` | no | The 18 caption styles: id, name, how each one looks, and whether it is a Creator style. |
 | `studio_link` | no | A studio link that opens set up with your settings. Works on every plan. |
 | `account_status` | yes | Your plan, cloud minutes left this period, the date they reset, and whether it includes agent captioning. |
 | `transcribe` | yes | Every word of a file with its start and end time in seconds, plus the SRT text. Writes no file. |

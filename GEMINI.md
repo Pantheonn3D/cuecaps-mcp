@@ -2,7 +2,7 @@
 
 The `cuecaps` MCP server makes animated word-by-word captions for TikTok, YouTube Shorts, Reels and YouTube videos.
 
-- `list_styles` lists the 10 caption styles. Call it when the user hasn't picked one.
+- `list_styles` lists the 18 caption styles (five are Creator styles: any plan previews them, exporting a video with one needs Creator). Call it when the user hasn't picked one.
 - `studio_link` returns a cuecaps.com/studio link set up with the style, words per caption, position, frame shape,
   language and Fast edit tools (`fast`: deadspace, fillers, retakes, zoom, norm, or all), plus the look the user
   describes: `font`, `color`, `highlight`, `emphasis`, `mark`, `anim`, `case`, `size`, and `voice: true` to remove

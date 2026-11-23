@@ -18,7 +18,7 @@ Add a remote MCP server with Streamable HTTP transport:
 }
 ```
 
-It has two tools: `list_styles` and `studio_link`. Test it by calling `list_styles`; it returns 10 styles with an `id`,
+It has two tools: `list_styles` and `studio_link`. Test it by calling `list_styles`; it returns 18 styles with an `id`,
 `name` and `look`. No environment variables are needed.
 
 ## 2. Local server (captions files on the user's computer)
